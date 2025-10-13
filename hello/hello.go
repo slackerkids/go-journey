@@ -16,7 +16,7 @@ func main() {
 
 	names := []string{"Gladys", "Samantha", "Darrin"}
 
-	message, err := greetings.Hellos("Gladys")
+	message, err := greetings.Hellos(names)
 	if err != nil {
 		log.Fatal(err)
 	}
