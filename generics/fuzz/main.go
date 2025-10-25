@@ -1,20 +1,27 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"unicode/utf8"
+)
 
 func main() {
 	input := "The quick brown fox jumped over lazy dog"
-	rev := Reverse(input)
-	doubleRev := Reverse(rev)
+	rev, revErr := Reverse(input)
+	doubleRev, doubleRevErr := Reverse(rev)
 	fmt.Printf("Original: %q\n", input)
-	fmt.Printf("Reversed: %q\n", rev)
-	fmt.Printf("Re-reversed: %q\n", doubleRev)
+	fmt.Printf("Reversed: %q, err: %v\n", rev, revErr)
+	fmt.Printf("Re-reversed: %q, err: %v\n", doubleRev, doubleRevErr)
 }
 
-func Reverse(s string) string {
-	b := []byte(s)
-	for i, j := 0, len(b)-1; i < len(b)/2; i, j = i+1, j-1 {
-		b[i], b[j] = b[j], b[i]
+func Reverse(s string) (string, error) {
+	if !utf8.ValidString(s) {
+		return s, errors.New("input is not valid UTF-8")
 	}
-	return string(b)
+	r := []rune(s)
+	for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return string(r), nil
 }
