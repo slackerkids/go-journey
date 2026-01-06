@@ -5,62 +5,30 @@ import (
 	"sync"
 )
 
-var mu sync.Mutex
-
-func Count(num *int) {
-	for range 100000 {
-		mu.Lock()
-		*num++
-		mu.Unlock()
-	}
+type Counter struct {
+	mu    sync.Mutex
+	value int
 }
 
-func Subtract(num *int) {
-	for range 100000 {
-		mu.Lock()
-		*num--
-		mu.Unlock()
-	}
+func (c *Counter) Increment() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.value++
 }
+
 func main() {
-	var counter int
+	c := Counter{}
+
 	var wg sync.WaitGroup
-	wg.Add(6)
 
-	var m sync.Map
-
-	m.Store("hello", 1)
-
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		Count(&counter)
-	}()
-
-	go func() {
-		defer wg.Done()
-		Subtract(&counter)
-	}()
-
-	go func() {
-		defer wg.Done()
-		Count(&counter)
-	}()
-
-	go func() {
-		defer wg.Done()
-		Subtract(&counter)
-	}()
-
-	go func() {
-		defer wg.Done()
-		Count(&counter)
-	}()
-
-	go func() {
-		defer wg.Done()
-		Subtract(&counter)
+		for range 100 {
+			c.Increment()
+		}
 	}()
 
 	wg.Wait()
-	fmt.Println(counter)
+	fmt.Println(c.value)
 }
